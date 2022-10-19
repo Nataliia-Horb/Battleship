@@ -2,74 +2,88 @@ package org.example;
 
 import lombok.Data;
 
-import java.util.Arrays;
+import java.util.Scanner;
 
-public class Battlefield {
-    char [][] field;
-    boolean check;
+@Data
+public class GameRealisation {
+    String name;
+    char[][] field;
+    Scanner scan;
+    int shipCount;
 
-    public Battlefield(int size) {
-        this.field = new char[size][size];
+    int fieldLength;
+
+    boolean successfulStrike = true;
+
+    public GameRealisation(String name, char[][] fieldEnemy, Scanner scan, int shipCount) {
+        this.name = name;
+        this.field = fieldEnemy;
+        this.scan = scan;
+        this.shipCount = shipCount;
+        this.fieldLength = fieldEnemy.length;
     }
-    private char[][] createEmptyField() {
-         for (int i=0; i< field.length; i++) {
-             for (int j=0; j< field[0].length; j++) {
-                 field [i][j]='-';
-             }
-         }
-         return field;
+
+    public void attack() {
+        int x = enterEnemyCoordinate("X");
+        int y = enterEnemyCoordinate("Y");
+
+        if (field[y][x] == '^') {
+            successfulStrike = true;
+            field[y][x] = 'X';
+            if ((checkCoordinate(y - 1, field) && field[y - 1][x] == '^') || (checkCoordinate(y + 1, field) && field[y + 1][x] == '^')) {
+                printField(field);
+                System.out.println("wounded");
+            } else {
+                shipCount--;
+                System.out.println(shipCount);
+                printField(field);
+                System.out.println("killed");
+            }
+        } else if (field[y][x] == '>') {
+            successfulStrike = true;
+            field[y][x] = 'X';
+            if ((checkCoordinate(x - 1, field) && field[y][x - 1] == '>') || (checkCoordinate(x + 1, field) && field[y][x + 1] == '>')) {
+                printField(field);
+                System.out.println("wounded");
+            } else {
+                shipCount--;
+                System.out.println(shipCount);
+                printField(field);
+                System.out.println("killed");
+
+            }
+        } else {
+            successfulStrike = false;
+            field[y][x] = '#';
+            printField(field);
+            System.out.println("past");
+        }
     }
-    /*public char [][] createHorizontalShip( Ship oneShip ) {
-check=false;
-        char[][]correctField= copyField(field);
-        for (int i = oneShip.getStartPositionY() - 1; i <= oneShip.getStartPositionY() + 1; i++) {
-            if (i>=0 && i< correctField.length) {
-                for (int j = oneShip.getStartPositionX() - 1; j <= oneShip.getStartPositionX() + oneShip.getSize(); j++) {
-                    if (j >= 0  && j<correctField[0].length) {
-                        if (correctField[i][j]!='-' && correctField[i][j]!='.' ) {
-                            System.out.println();
-                            System.out.println("This part of the field is already occupied");
-                            check=true;
-                            return null;
-                        }
-                        correctField[i][j] = '.';
-                    }
-                }
-            }
-        }
-        for (int j = oneShip.getStartPositionX(); j < oneShip.getStartPositionX() + oneShip.getSize(); j++) {
-            correctField[oneShip.getStartPositionY()][j] = '*';
-        }
-return correctField;
-        }
 
-  public char [][] createVerticalShip( Ship oneShip ) {
-      char[][]correctField= copyField(field);
-      check=false;
-            for (int i = oneShip.getStartPositionY() - 1; i <= oneShip.getStartPositionY() + oneShip.getSize(); i++) {
-                if (i >= 0 && i < correctField.length) {
-                    for (int j = oneShip.getStartPositionX() - 1; j <= oneShip.getStartPositionX() + 1; j++) {
-                        if (j >= 0 && j < correctField[0].length) {
-                            if (correctField[i][j]!='-' && correctField[i][j]!='.' ) {
-                                System.out.println();
-                                System.out.println("This part of the field is already occupied");
-                                check=true;
-                                return null;
-                            }
-                            correctField[i][j] = '.';
-                        }
-                    }
-                }
-            }
-            for (int i = oneShip.getStartPositionY(); i < oneShip.getStartPositionY() + oneShip.getSize(); i++) {
-                correctField[i][oneShip.getStartPositionX()] =  '*';
-            }
-            return correctField;
+    private int enterEnemyCoordinate(String nameCoordinate) {
+        int coordinate;
+        do {
+            System.out.println(name + " enter enemy " + nameCoordinate + "  coordinate: ");
+            coordinate = scan.nextInt();
         }
+        while (!checkCoordinate(coordinate, field));
+        return coordinate;
+    }
 
 
-    public void print( char [][] field) {
-        if (field!=null) {
+    //Проверка координаты на валидность
+    public boolean checkCoordinate(int k, char[][] field) {
+        if (k >= 0 && k < field.length) {
+            return true;
+        } else {
+            System.out.println("The " + k + " is not valid");
+            return false;
+        }
+    }
+
+    //Печатаем поле каджый раз, когда был нанесен удар
+    public static void printField(char[][] field) {
+        if (field != null) {
             for (int i = 0; i < field.length; i++) {
                 System.out.println();
                 for (int j = 0; j < field[0].length; j++) {
@@ -79,12 +93,4 @@ return correctField;
         }
         System.out.println();
     }
-
-    public void setField(char[][] correctField) {
-        if (correctField!= null) {
-            this.field = copyField(correctField);
-        }
-    }*/
-
-
 }
